@@ -27,9 +27,11 @@
 #include "llvm/Pass.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
+#include "llvm/Transforms/Utils/BasicBlockUtils.h"
 
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
+#include "llvm/IR/Constants.h"
 
 #include <string>
 #include <list>
@@ -70,7 +72,7 @@ namespace {
             // Here we are iterating BasicBlocks of the function
             basicBlocksGathered.push_back(&*IF);
         }
-
+        errs() << "BB Total:" << basicBlocksGathered.size() << "\n";
         // Then for every BB let's put a new branch with some
         // gibberish
 
@@ -79,6 +81,7 @@ namespace {
           BasicBlock * bb = basicBlocksGathered.front();
           createNewFlow(&F, bb);
           basicBlocksGathered.pop_front();
+          errs() << "BB Left:" << basicBlocksGathered.size() << "\n";
         }
 
 
@@ -89,9 +92,59 @@ namespace {
       }
 
       void createNewFlow(Function *F, BasicBlock * BB) {
+        // http://llvm.org/doxygen/classllvm_1_1BasicBlock.html#a19445f836d9e1ecb32cba27ec4338fff
+        // ok, docs recomends to use BasicBlockUtils
+
+        // creating a condition
+        Value * LHS = ConstantInt::get(Type::getInt64Ty(F->getContext()), 0x41414141, false );
+        Value * RHS = ConstantInt::get(Type::getInt64Ty(F->getContext()), 0x41414141, false );
+
+        // The always true condition. End of the first block
+        Twine * deadbeef = new Twine("deadbeefalwaystrue");
+        
+        Instruction * splitBefore;
+        
+        int countInst = 0;
+        // Iterate the instructions of the BB
+        for ( BasicBlock::iterator IB = BB->begin(), IB_e = BB->end(); IB != IB_e; ++IB) {
+            // if the instruction is the fourth of the basic block
+            splitBefore = &*IB;  
+            if(countInst == 4) {
+              // This instruction compares its operands according to the predicate given to the constructor
+              // http://llvm.org/doxygen/classllvm_1_1FCmpInst.html
+              ICmpInst * cond = new ICmpInst(splitBefore, ICmpInst::ICMP_EQ , LHS, RHS, *deadbeef);
+
+              // then split the BB here
+              errs() << "Splitting...\n";
+              TerminatorInst * ti = llvm::SplitBlockAndInsertIfThen(cond, splitBefore, false, nullptr, nullptr);
+
+              /*   
+              At this point we generated a split
+              %deadbeefalwaystrue = icmp eq i64 1094795585, 1094795585
+              br i1 %deadbeefalwaystrue, label %2, label %3
+
+              ; <label>:2:                                      ; preds = %entry
+                br label %3
+
+              ; <label>:3:                                      ; preds = %entry, %2
+                %cmp = icmp eq i32 %add, 0
+                br i1 %cmp, label %if.then, label %if.end
+
+            */
+
+              errs() << "Finished Splitting, countInst: " << countInst << " ...\n";
+              return;
+            }
+            errs() << "Outside if, countInst: " << countInst << " \n";
+            IB++;
+            countInst++;
+            
+        }
+
 
       }
   };
 }
 
-
+char IRobsPass::ID = 0;
+static RegisterPass<IRobsPass> X("IRobs", "Mess around with BB", false, false);
