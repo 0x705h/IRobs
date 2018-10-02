@@ -96,8 +96,8 @@ namespace {
         // ok, docs recomends to use BasicBlockUtils
 
         // creating a condition
-        Value * LHS = ConstantInt::get(Type::getInt64Ty(F->getContext()), 0x41414141, false );
-        Value * RHS = ConstantInt::get(Type::getInt64Ty(F->getContext()), 0x41414141, false );
+        Value * LHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x41414141, false );
+        Value * RHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x41414141, false );
 
         // The always true condition. End of the first block
         Twine * deadbeef = new Twine("deadbeefalwaystrue");
@@ -117,7 +117,26 @@ namespace {
               // then split the BB here
               errs() << "Splitting...\n";
               TerminatorInst * ti = llvm::SplitBlockAndInsertIfThen(cond, splitBefore, false, nullptr, nullptr);
+              // Now that we have the TerminatorInst of the split operation
+              // let's get the successors and operate in the 
+              
+              BasicBlock * modifiedBB = ti->getParent();
+              errs() << "************ PARENT BB ***************\n";
+              modifiedBB->dump();
+              errs() << "************ END PARENT BB ***************\n";
 
+              ti = modifiedBB->getTerminator();
+              for (unsigned I = 0, NSucc = ti->getNumSuccessors(); I < NSucc; ++I) {
+                errs() << "Split Successor: " << I << "\n";
+                BasicBlock *succ = ti->getSuccessor(I);
+                succ->dump();
+
+                // Do stuff with Succ
+              }
+
+              // update the iterators
+              IB = BB->begin();
+              IB_e = BB->end();
               /*   
               At this point we generated a split
               %deadbeefalwaystrue = icmp eq i64 1094795585, 1094795585
@@ -131,12 +150,14 @@ namespace {
                 br i1 %cmp, label %if.then, label %if.end
 
             */
+              // Now we create a new BB
+
 
               errs() << "Finished Splitting, countInst: " << countInst << " ...\n";
-              return;
+              //return;
             }
-            errs() << "Outside if, countInst: " << countInst << " \n";
-            IB++;
+            //errs() << "Outside if, countInst: " << countInst << " \n";
+            //IB++;
             countInst++;
             
         }
