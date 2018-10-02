@@ -71,12 +71,25 @@ namespace {
             basicBlocksGathered.push_back(&*IF);
         }
 
+        // Then for every BB let's put a new branch with some
+        // gibberish
+
+        while(! basicBlocksGathered.empty() ) {
+          // get the first BB gathered
+          BasicBlock * bb = basicBlocksGathered.front();
+          createNewFlow(&F, bb);
+          basicBlocksGathered.pop_front();
+        }
 
 
         // return false to tell that function was not
         // modified by this pass, but now we'll modify
         // every function, so always return true
         return true;
+      }
+
+      void createNewFlow(Function *F, BasicBlock * BB) {
+
       }
   };
 }
