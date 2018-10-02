@@ -32,6 +32,7 @@
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
 
 #include <string>
+#include <list>
 
 using namespace llvm;
 
@@ -52,77 +53,32 @@ template <typename T> static std::string ToString(const T *Obj) {
 
 
 namespace {
-  struct IRobsPass : public BasicBlockPass {
+  struct IRobsPass : public FunctionPass {
   static char ID;
     public:
-      IRobsPass() : BasicBlockPass(ID) {}
+      IRobsPass() : FunctionPass(ID) {}
 
-      virtual bool runOnBasicBlock(BasicBlock &BB) {
-        const DataLayout &DL = BB.getModule()->getDataLayout();
-        // Iterate all instructions on the current BB
-        for ( BasicBlock::iterator II = BB.begin(), II_e = BB.end(); II != II_e; ++II) {
-            
-            
-            if(BranchInst *bInst = dyn_cast<BranchInst>(II)) {
-              bool isConditional = bInst->isConditional();
-              errs() << "I am a BranchInstruction and I am conditional\n";
-            }
-
+      virtual bool runOnFunction(Function &F) {
+        // we will always modify every function
+        // get current function name
+        errs() << "IRobs current function: " << F.getName() << "\n";
+        //const DataLayout &DL = BB.getModule()->getDataLayout();
+        // Iterate all BasicBlocks on the current Function
+        // and gather all BasicBlocks
+        std::list<BasicBlock *> basicBlocksGathered;
+        for ( Function::iterator IF = F.begin(), IF_e = F.end(); IF != IF_e; ++IF) {
+            // Here we are iterating BasicBlocks of the function
+            basicBlocksGathered.push_back(&*IF);
         }
 
-        // return false to tell that basic block was not
-        // modified by this pass
-        return false;
+
+
+        // return false to tell that function was not
+        // modified by this pass, but now we'll modify
+        // every function, so always return true
+        return true;
       }
   };
-
-
-
-} // end of anon namespace
-
-char IRobsPass::ID = 0;
-static RegisterPass<IRobsPass> X("IRobs", "Mess around with BB", false, false);
-/*
-
-namespace {
-  // Hello - The first implementation, without getAnalysisUsage.
-  struct Hello : public FunctionPass {
-    static char ID; // Pass identification, replacement for typeid
-    Hello() : FunctionPass(ID) {}
-
-    bool runOnFunction(Function &F) override {
-      ++HelloCounter;
-      errs() << "Hello: ";
-      errs().write_escaped(F.getName()) << '\n';
-      return false;
-    }
-  };
 }
 
-char Hello::ID = 0;
-static RegisterPass<Hello> X("hello", "Hello World Pass");
 
-namespace {
-  // Hello2 - The second implementation with getAnalysisUsage implemented.
-  struct Hello2 : public FunctionPass {
-    static char ID; // Pass identification, replacement for typeid
-    Hello2() : FunctionPass(ID) {}
-
-    bool runOnFunction(Function &F) override {
-      ++HelloCounter;
-      errs() << "Hello: ";
-      errs().write_escaped(F.getName()) << '\n';
-      return false;
-    }
-
-    // We don't modify the program, so we preserve all analyses.
-    void getAnalysisUsage(AnalysisUsage &AU) const override {
-      AU.setPreservesAll();
-    }
-  };
-}
-
-char Hello2::ID = 0;
-static RegisterPass<Hello2>
-Y("hello2", "Hello World Pass (with getAnalysisUsage implemented)");
-*/

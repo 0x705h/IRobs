@@ -1,7 +1,7 @@
 
 # IRobs
 
-Out-Of-Tree _LLVM Pass_ for binary targets obfuscation.
+A very simple proof of concept for Out-Of-Tree _LLVM Pass_ binary target obfuscation.
 
 ## Dependencies
 

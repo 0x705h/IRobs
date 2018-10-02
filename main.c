@@ -6,12 +6,15 @@ int main(void) {
 
 	struct timeval t;
 
-	int res = 0;
+	// setting volatile integer avoiding compiler
+	// to optimize out this variable
+	volatile int res = 0;
 
 	gettimeofday(&t, NULL);
 	printf("I will call a function...\n");
-	res = do_math(256, t.tv_usec);
-
+	if( res == 0 ) {
+		res = do_math(256, t.tv_usec);
+	}
 	printf("Result :%d\n", res);
 
 	return 0; 
