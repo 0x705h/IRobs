@@ -43,7 +43,7 @@ using namespace llvm;
 
 #define DEBUG_TYPE "hello"
 
-STATISTIC(HelloCounter, "Counts number of functions greeted");
+//STATISTIC(HelloCounter, "Counts number of functions greeted");
 
 // Helper method for converting LLVM entities that support the print() method
 // to a string.
@@ -104,7 +104,7 @@ namespace {
         Value * RHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x42424242, false );
 
         // The always false condition. End of the first block
-        Twine * deadbeef = new Twine("deadbeefalwaystrue");
+        Twine * deadbeef = new Twine("cond_always_false");
         
         Instruction * splitBefore;
         
@@ -117,7 +117,7 @@ namespace {
               // This instruction compares its operands according to the predicate given to the constructor
               // http://llvm.org/doxygen/classllvm_1_1FCmpInst.html
               ICmpInst * cond = new ICmpInst(splitBefore, ICmpInst::ICMP_EQ , LHS, RHS, *deadbeef);
-
+              
               // then split the BB here
               errs() << "Splitting...\n";
               TerminatorInst * ti = llvm::SplitBlockAndInsertIfThen(cond, splitBefore, false, nullptr, nullptr);
