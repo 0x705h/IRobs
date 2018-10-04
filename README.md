@@ -1,7 +1,10 @@
 
 # IRobs
 
-A very simple proof of concept for Out-Of-Tree _LLVM Pass_ binary target obfuscation.
+A simple proof of concept for Out-Of-Tree _LLVM Pass_ binary target obfuscation.
+It splits BasicBlocks and add StoreInst instructions in an always-false condition, creating new execution flows in every BasicBlock split. 
+
+Do not use this project for production! This is easely defeated!
 
 ## Before and after IRobs pass
 
@@ -39,11 +42,7 @@ LLVM should be installed at _$HOME/llvm-stable_
 	* cd build
 	* cmake .. -DLLVM_ROOT=$HOME/llvm-stable
 	* cd .. && make
-
-## Problems
-
-This basic block mangler can be easely defeated. There is a lot of room for improvement :)
-
+	* ./test.sh # create binaries using the IRobs pass
 
 
 
