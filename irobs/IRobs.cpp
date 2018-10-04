@@ -101,9 +101,9 @@ namespace {
         IRBuilder<> builder(ctx);
         // creating a condition
         Value * LHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x41414141, false );
-        Value * RHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x41414141, false );
+        Value * RHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x42424242, false );
 
-        // The always true condition. End of the first block
+        // The always false condition. End of the first block
         Twine * deadbeef = new Twine("deadbeefalwaystrue");
         
         Instruction * splitBefore;
@@ -131,7 +131,6 @@ namespace {
               //Value * inmediate = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x424f475553, false);
               Type  * ty = Type::getInt32Ty(ctx);
               Value *iptr = ConstantInt::get(PointerType::getInt32Ty(F->getContext()), 0x424f475553, false);
-              //AllocaInst * allocaInst = builder.CreateAlloca(;
               
               Twine * variable_str = new Twine("variable_str");
               Twine * bogus = new Twine("bogus_str");
@@ -165,77 +164,13 @@ namespace {
               store1 = new StoreInst (rval2, r1, ti);
               store1 = new StoreInst (rval1, r2, ti);
 
-              //auto *alloca_var  = builder.CreateAlloca(IntegerType::get(F->getContext(), 32), (Value *) r1, *alloca_str);
-              //alloca_var->setAlignment(4);
-              //AllocaInst* newTemp = new AllocaInst(llvm::Type::getInt32Ty(ctx), 0, 4, ti);
-
-
-              //AllocaInst *variable = builder.CreateAlloca(builder.getInt32Ty(), nullptr, *variable_str);
-              //auto *ai = new AllocaInst(IntegerType::get(ctx, 32));
-              //AllocaInst * variable = new AllocaInst(Type::getInt32Ty(), *variable_str);
-              //Value * ptr2 = nullptr;
-             
-              //ptr2 = builder.CreatePointerCast(ptr2, Type::getInt32PtrTy(ctx), *bogus);
-              
-              
-              //PointerType * pt  = new PointerType(Type::getPointerElementType() ,0x424f475553);
-
-              //auto *ai = new AllocaInst(Type::getInt32PtrTy(F->getContext()), *bogus);
-              //auto *ii = new LoadInst()
-
-              //IntegerType * t = Type::getInt32Ty(F->getContext());
-              //Use * u = new Use()
-              //auto *newInst = new Instruction(t, 0x42424242,,
-              
-              //AtomicRMWInst * armwi = new AtomicRMWInst()
-              //AllocaInst * allocaInst = builder.CreateAlloca(inmediate->getType());
-              //LoadInst * li = builder.CreateLoad(allocaInst);
-              //errs() << "Before crash...." << ptr->getType() << "\n";
-              //LoadInst * li = builder.CreateLoad(iptr, bogus);
-              //errs() << "afer? crash....\n";
-              
-              //LoadInst(inmediate, *bogus, ti);
-              //ti->insertBefore()               
-              
-              /*
-              BasicBlock * modifiedBB = ti->getParent();
-              errs() << "************ PARENT BB ***************\n";
-              modifiedBB->dump();
-              errs() << "************ END PARENT BB ***************\n";
-
-              ti = modifiedBB->getTerminator();
-              for (unsigned I = 0, NSucc = ti->getNumSuccessors(); I < NSucc; ++I) {
-                errs() << "Split Successor: " << I << "\n";
-                BasicBlock *succ = ti->getSuccessor(I);
-                succ->dump();
-
-                // Do stuff with Succ
-              }
-              */
               // update the iterators
               IB = BB->begin();
               IB_e = BB->end();
-              /*   
-              At this point we generated a split
-              %deadbeefalwaystrue = icmp eq i64 1094795585, 1094795585
-              br i1 %deadbeefalwaystrue, label %2, label %3
-
-              ; <label>:2:                                      ; preds = %entry
-                br label %3
-
-              ; <label>:3:                                      ; preds = %entry, %2
-                %cmp = icmp eq i32 %add, 0
-                br i1 %cmp, label %if.then, label %if.end
-
-            */
-              // Now we create a new BB
-
 
               errs() << "Finished Splitting, countInst: " << countInst << " ...\n";
-              //return;
             }
-            //errs() << "Outside if, countInst: " << countInst << " \n";
-            //IB++;
+
             countInst++;
             
         }
