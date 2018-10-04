@@ -3,6 +3,12 @@
 
 A very simple proof of concept for Out-Of-Tree _LLVM Pass_ binary target obfuscation.
 
+## Before and after IRobs pass
+
+![Before](https://raw.githubusercontent.com/0x705h/IRobs/master/images/to/IRobs-no-pass.png)
+
+![After](https://raw.githubusercontent.com/0x705h/IRobs/master/images/to/IRobs-pass.png)
+
 ## Dependencies
 
 Download stable version of [LLVM](https://github.com/llvm-mirror/llvm/tree/stable)
@@ -31,6 +37,10 @@ LLVM should be installed at _$HOME/llvm-stable_
 	* cd build
 	* cmake .. -DLLVM_ROOT=$HOME/llvm-stable
 	* cd .. && make
+
+## Problems
+
+This basic block mangler can be easely defeated. There is a lot of room for improvement :)
 
 
 
