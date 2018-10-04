@@ -3,8 +3,8 @@ echo "Building normal target, main.native binary"
 gcc -O0 main.c -o main.native
 echo "Appliying IRobs passes"
 ~/llvm-stable/bin/clang -S -emit-llvm main.c -o main.ll
-~/llvm-stable/bin/opt -S -load ./irobs/IRobs.so -IRobs main.ll
-~/llvm-stable/bin/llc main.ll -o main.s
+~/llvm-stable/bin/opt -S -load ./irobs/IRobs.so -IRobs main.ll > main.pass.ll
+~/llvm-stable/bin/llc --x86-asm-syntax=intel -O0 main.pass.ll -o main.s
 echo "compiling main.native.pass binary..."
 gcc -O0 main.s -o main.native.pass
 
