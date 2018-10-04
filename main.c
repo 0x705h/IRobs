@@ -20,6 +20,13 @@ int main(void) {
 	return 0; 
 }
 
+int assign_constant_values() {
+	int AAAA = 0x41414141;
+	int BBBB = 0x42424242;
+
+	return AAAA + BBBB;
+}
+
 int do_math(int a, int b) {
 
 	if(a+b == 0) {

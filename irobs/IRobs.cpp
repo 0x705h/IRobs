@@ -31,6 +31,9 @@
 
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/TypeBuilder.h"
 #include "llvm/IR/Constants.h"
 
 #include <string>
@@ -94,7 +97,8 @@ namespace {
       void createNewFlow(Function *F, BasicBlock * BB) {
         // http://llvm.org/doxygen/classllvm_1_1BasicBlock.html#a19445f836d9e1ecb32cba27ec4338fff
         // ok, docs recomends to use BasicBlockUtils
-
+        LLVMContext &ctx = F->getContext();
+        IRBuilder<> builder(ctx);
         // creating a condition
         Value * LHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x41414141, false );
         Value * RHS = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x41414141, false );
@@ -118,8 +122,82 @@ namespace {
               errs() << "Splitting...\n";
               TerminatorInst * ti = llvm::SplitBlockAndInsertIfThen(cond, splitBefore, false, nullptr, nullptr);
               // Now that we have the TerminatorInst of the split operation
-              // let's get the successors and operate in the 
+              // WHICH POINTS TO THE NEWLY CREATED BB on the split!!!
+              // lets add some instructions to the new BB
+
+              // on creating new instructions
+              // http://llvm.org/docs/ProgrammersManual.html#creating-and-inserting-new-instructions
+              //Value * int32PtrTy = Type::getInt32PtrTy
+              //Value * inmediate = ConstantInt::get(Type::getInt32Ty(F->getContext()), 0x424f475553, false);
+              Type  * ty = Type::getInt32Ty(ctx);
+              Value *iptr = ConstantInt::get(PointerType::getInt32Ty(F->getContext()), 0x424f475553, false);
+              //AllocaInst * allocaInst = builder.CreateAlloca(;
               
+              Twine * variable_str = new Twine("variable_str");
+              Twine * bogus = new Twine("bogus_str");
+
+
+              Twine * rogue_var1_str = new Twine("rogue_var1");
+              Twine * rogue_var2_str = new Twine("rogue_var2");
+              Value * rval1 =ConstantInt::get(Type::getInt32Ty(ctx), 0, false);
+              Value * rval2 =ConstantInt::get(Type::getInt32Ty(ctx), 0, false);
+
+              GlobalVariable 	* r1 = new GlobalVariable(
+                *F->getParent(), 
+                Type::getInt32Ty(ctx), false,
+                GlobalValue::CommonLinkage, 
+                (Constant * )rval1,
+                *rogue_var1_str);
+              GlobalVariable 	* r2 = new GlobalVariable(
+                *F->getParent(), 
+                Type::getInt32Ty(ctx), false,
+                GlobalValue::CommonLinkage, 
+                (Constant * )rval2,
+                *rogue_var2_str);
+
+              LoadInst * load1, * load2;
+              StoreInst * store1, * store2;
+              load1 = new LoadInst ((Value *)r1, "new_load1", ti);
+              load2 = new LoadInst ((Value *)r2, "new_load2", ti);
+              
+              Twine * alloca_str = new Twine("alloca_str");
+              
+              store1 = new StoreInst (rval2, r1, ti);
+              store1 = new StoreInst (rval1, r2, ti);
+
+              //auto *alloca_var  = builder.CreateAlloca(IntegerType::get(F->getContext(), 32), (Value *) r1, *alloca_str);
+              //alloca_var->setAlignment(4);
+              //AllocaInst* newTemp = new AllocaInst(llvm::Type::getInt32Ty(ctx), 0, 4, ti);
+
+
+              //AllocaInst *variable = builder.CreateAlloca(builder.getInt32Ty(), nullptr, *variable_str);
+              //auto *ai = new AllocaInst(IntegerType::get(ctx, 32));
+              //AllocaInst * variable = new AllocaInst(Type::getInt32Ty(), *variable_str);
+              //Value * ptr2 = nullptr;
+             
+              //ptr2 = builder.CreatePointerCast(ptr2, Type::getInt32PtrTy(ctx), *bogus);
+              
+              
+              //PointerType * pt  = new PointerType(Type::getPointerElementType() ,0x424f475553);
+
+              //auto *ai = new AllocaInst(Type::getInt32PtrTy(F->getContext()), *bogus);
+              //auto *ii = new LoadInst()
+
+              //IntegerType * t = Type::getInt32Ty(F->getContext());
+              //Use * u = new Use()
+              //auto *newInst = new Instruction(t, 0x42424242,,
+              
+              //AtomicRMWInst * armwi = new AtomicRMWInst()
+              //AllocaInst * allocaInst = builder.CreateAlloca(inmediate->getType());
+              //LoadInst * li = builder.CreateLoad(allocaInst);
+              //errs() << "Before crash...." << ptr->getType() << "\n";
+              //LoadInst * li = builder.CreateLoad(iptr, bogus);
+              //errs() << "afer? crash....\n";
+              
+              //LoadInst(inmediate, *bogus, ti);
+              //ti->insertBefore()               
+              
+              /*
               BasicBlock * modifiedBB = ti->getParent();
               errs() << "************ PARENT BB ***************\n";
               modifiedBB->dump();
@@ -133,7 +211,7 @@ namespace {
 
                 // Do stuff with Succ
               }
-
+              */
               // update the iterators
               IB = BB->begin();
               IB_e = BB->end();
