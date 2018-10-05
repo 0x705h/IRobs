@@ -2,9 +2,11 @@
 # IRobs
 
 A simple proof of concept for Out-Of-Tree _LLVM Pass_ binary target obfuscation.
-It splits BasicBlocks and add StoreInst instructions in an always-false condition, creating new execution flows in every BasicBlock split. 
 
-Do not use this project for production! This is easely defeated!
+This LLVM Pass splits BasicBlocks and insert some junk instructions in the new branch,
+making more complex the function graph, but without modifiying the original execution flow.
+
+There is a lot of room for improvement. **Do not use** this project for production! This is easily defeated!
 
 ## Before and after IRobs pass
 
@@ -21,7 +23,7 @@ Download stable version of [LLVM](https://github.com/llvm-mirror/llvm/tree/stabl
 	* git clone https://github.com/llvm-mirror/llvm.git
 	* git checkout stable
 
-Inside cloned LLVM directory, download [clang](https://github.com/llvm-mirror/clang)
+Download [clang](https://github.com/llvm-mirror/clang) into the cloned LLVM directory
 
 	* git clone --depth=1 --branch=google/stable https://github.com/llvm-mirror/clang
 
